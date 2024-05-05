@@ -1,5 +1,51 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 
+let lastKeyupTime = 0;
+let lastKeyWasShifted: boolean
+
+function openSearchWhenDoubleShift(event: KeyboardEvent, app: App) {
+	const key = event.key
+	if (key !== "Control") {
+		lastKeyupTime = 0;
+		return;
+	}
+	if (lastKeyWasShifted) {
+		lastKeyWasShifted = false;
+
+		return;
+	}
+	if (Date.now() - lastKeyupTime < 500) {
+		lastKeyupTime = 0;
+		getEditorCursor()
+		return;
+	}
+	lastKeyupTime = Date.now();
+}
+
+function getEditorCursor() {
+	const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+
+	// Make sure the user is editing a Markdown file.
+	if (view) {
+		const cursor = view.editor.getCursor();
+		console.log(cursor)
+		const selection = view.editor.getSelection();
+		console.log(selection)
+
+		window.location.href = `mkdictionaries:///?text=${selection}`
+
+	}
+
+}
+
+function clearTimerWhenControlled(event: KeyboardEvent) {
+	const key = event.key
+	const ctrlKey = event.ctrlKey;
+	if (key !== "Control" && ctrlKey === true) {
+		lastKeyWasShifted = true
+	}
+}
+
 // Remember to rename these classes and interfaces!
 
 interface MyPluginSettings {
@@ -14,6 +60,8 @@ export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
 
 	async onload() {
+		this.registerDomEvent(window, 'keyup', (event) => openSearchWhenDoubleShift(event, this.app))
+		this.registerDomEvent(window, 'keydown', (event) => clearTimerWhenControlled(event))
 		await this.loadSettings();
 
 		// This creates an icon in the left ribbon.
@@ -97,12 +145,12 @@ class SampleModal extends Modal {
 	}
 
 	onOpen() {
-		const {contentEl} = this;
+		const { contentEl } = this;
 		contentEl.setText('Woah!');
 	}
 
 	onClose() {
-		const {contentEl} = this;
+		const { contentEl } = this;
 		contentEl.empty();
 	}
 }
@@ -116,7 +164,7 @@ class SampleSettingTab extends PluginSettingTab {
 	}
 
 	display(): void {
-		const {containerEl} = this;
+		const { containerEl } = this;
 
 		containerEl.empty();
 
