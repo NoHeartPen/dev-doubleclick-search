@@ -33,11 +33,18 @@ function getEditorCursor() {
 	if (view) {
 		const selection = view.editor.getSelection();
 		console.log(selection)
+		// 如果未选中文本，那么暂时不做任何处理
+		if (selection === "") {
+			// TODO 自动获取光标前后的文字
+			return;
+		}
+
 		console.debug(`all result: ${scan_input_string(selection)}`)
 		const jishokei_list: string[] = scan_input_string(selection)
 		window.location.href = `mkdictionaries:///?text=${jishokei_list[0]}`
 		//window.location.href = `goldendict:///${jishokei_list[0]}`
 		window.location.href = `eudic://dict//${jishokei_list[0]}`
+		window.location.href = `dict://${jishokei_list[0]}`
 	}
 
 }
@@ -92,7 +99,6 @@ function convert_nonjishokei(input_text: string): string[] {
 		if (orthography_text_list !== null) {
 			for (const orthography_text of orthography_text_list) {
 				if (orthography_text != "") {
-					// wode
 					if (!(orthography_text in orthography_list)) {
 						orthography_list.push(orthography_text);
 					}
