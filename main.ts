@@ -1,20 +1,22 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 
 let lastKeyupTime = 0;
-let lastKeyWasShifted: boolean
+let lastKeyWasDouble: boolean
 
 let indexDb: { [key: string]: string[] };
 let conjugateRuleDb: { [key: string]: string[] };
 let specialRuleDb: { [key: string]: string[] };
 
-function openSearchWhenDoubleShift(event: KeyboardEvent, app: App) {
+
+function openSearchWhenDoubleClicked(event: KeyboardEvent, app: App) {
 	const key = event.key
+	// TODO 读取用户自定义的双击按键名
 	if (key !== "Control") {
 		lastKeyupTime = 0;
 		return;
 	}
-	if (lastKeyWasShifted) {
-		lastKeyWasShifted = false;
+	if (lastKeyWasDouble) {
+		lastKeyWasDouble = false;
 
 		return;
 	}
@@ -26,29 +28,62 @@ function openSearchWhenDoubleShift(event: KeyboardEvent, app: App) {
 	lastKeyupTime = Date.now();
 }
 
+
+/** 
+ * 用户双击时自动
+ */
+function clearTimerWhenControlled(event: KeyboardEvent) {
+	const key = event.key
+	// TODO 注意下面的按键需要
+	const userSetKey = event.ctrlKey;
+	// TODO ""
+	if (key !== "Control" && userSetKey === true) {
+		lastKeyWasDouble = true
+	}
+}
+
 function getEditorCursor() {
 	const view = this.app.workspace.getActiveViewOfType(MarkdownView);
 
 	// Make sure the user is editing a Markdown file.
 	if (view) {
-		const selection = view.editor.getSelection();
-		console.log(selection)
-		// 如果未选中文本，那么暂时不做任何处理
+		const editor = view.editor;
+		const selection = editor.getSelection();
+		let searchText = "";
 		if (selection === "") {
-			// TODO 自动获取光标前后的文字
-			return;
+			// 如果未选中文本，那么自动向后查找
+			const cursor = editor.getCursor();
+			const after_cursor_text = editor.getRange(cursor, { line: cursor.line, ch: editor.getLine(cursor.line).length });
+			searchText = after_cursor_text;
+		} else {
+			searchText = selection;
 		}
 
-		console.debug(`all result: ${scan_input_string(selection)}`)
-		const jishokei_list: string[] = scan_input_string(selection)
-		window.location.href = `mkdictionaries:///?text=${jishokei_list[0]}`
-		//window.location.href = `goldendict:///${jishokei_list[0]}`
-		window.location.href = `eudic://dict//${jishokei_list[0]}`
-		window.location.href = `dict://${jishokei_list[0]}`
+		console.debug(`all result: ${scan_input_string(searchText)}`)
+		const jishokei_list: string[] = scan_input_string(searchText)
+		doSearch(jishokei_list);
 	}
 
 }
 
+/**
+ * 执行搜索动作
+ * @param jishokei_list 推导的辞书形
+ */
+function doSearch(jishokei_list: string[]) {
+	window.location.href = `mkdictionaries:///?text=${jishokei_list[0]}`;
+	// GoldenDict，仅在 Window 和 Linux 上有效
+	//window.location.href = `goldendict:///${jishokei_list[0]}`
+	window.location.href = `eudic://dict//${jishokei_list[0]}`;
+	// macOS系统辞典程序
+	window.location.href = `dict://${jishokei_list[0]}`;
+}
+
+/**
+ * 
+ * @param input_text 
+ * @returns 
+ */
 export function convert_conjugate(input_text: string): string[] {
 	const input_stem: string = input_text.slice(0, -1);
 	const input_last_letter: string = input_text.slice(-1);
@@ -181,13 +216,6 @@ function scan_input_string(input_text: string): string[] {
 }
 
 
-function clearTimerWhenControlled(event: KeyboardEvent) {
-	const key = event.key
-	const ctrlKey = event.ctrlKey;
-	if (key !== "Control" && ctrlKey === true) {
-		lastKeyWasShifted = true
-	}
-}
 
 // Remember to rename these classes and interfaces!
 
@@ -215,6 +243,11 @@ export default class MyPlugin extends Plugin {
 	conjugateRuleDb: { [key: string]: string[] };
 	specialRuleDb: { [key: string]: string[] };
 
+	/**
+	 * 加载数据库
+	 * @param dbFileName 
+	 * @returns 
+	 */
 	async loadDB(dbFileName: string): Promise<{ [key: string]: string[] }> {
 		try {
 			if (await this.app.vault.adapter.exists(dbFileName)) {
@@ -241,7 +274,7 @@ export default class MyPlugin extends Plugin {
 	}
 
 	async onload() {
-		this.registerDomEvent(window, 'keyup', (event) => openSearchWhenDoubleShift(event, this.app))
+		this.registerDomEvent(window, 'keyup', (event) => openSearchWhenDoubleClicked(event, this.app))
 		this.registerDomEvent(window, 'keydown', (event) => clearTimerWhenControlled(event))
 		await this.loadSettings();
 		try {
