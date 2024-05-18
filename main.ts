@@ -55,6 +55,9 @@ function getEditorCursor() {
 			const cursor = editor.getCursor();
 			const after_cursor_text = editor.getRange(cursor, { line: cursor.line, ch: editor.getLine(cursor.line).length });
 			searchText = after_cursor_text;
+			// 如果未选中文本的话，自动向前查找
+			const before_cursor_text = editor.getRange({ line: cursor.line, ch: 0 }, cursor);
+			console.log(before_cursor_text)
 		} else {
 			searchText = selection;
 		}
