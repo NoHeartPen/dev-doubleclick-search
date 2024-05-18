@@ -1,4 +1,6 @@
-import { conjugateRuleDb, indexDb, specialRuleDb } from 'main';
+import { conjugateRuleDb, indexDb, specialRuleDb } from './main';
+
+
 
 /**
  * convert a verb conjugation to basic form.

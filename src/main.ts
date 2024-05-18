@@ -1,5 +1,5 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
-import { scan_input_string } from 'nonjishokei';
+import { scan_input_string } from 'src/nonjishokei';
 
 let lastKeyupTime = 0;
 let lastKeyWasDouble: boolean
