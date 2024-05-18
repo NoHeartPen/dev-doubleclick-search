@@ -116,7 +116,7 @@ export default class MyPlugin extends Plugin {
 	specialRuleDb: { [key: string]: string[] };
 
 	/**
-	 * 加载数据库
+	 * 读取JSON文件
 	 * @param dbFileName 
 	 * @returns 
 	 */
@@ -145,10 +145,10 @@ export default class MyPlugin extends Plugin {
 		}
 	}
 
-	async onload() {
-		this.registerDomEvent(window, 'keyup', (event) => openSearchWhenDoubleClicked(event, this.app))
-		this.registerDomEvent(window, 'keydown', (event) => clearTimerWhenControlled(event))
-		await this.loadSettings();
+	/**
+	 * 加载非辞書项目的数据文件
+	 */
+	private async loadNonJiShoKeiDB() {
 		try {
 			indexDb = await this.loadDB(this.settings.indexDbFileName);
 		} catch (e) {
@@ -176,6 +176,14 @@ export default class MyPlugin extends Plugin {
 			);
 			specialRuleDb = {};
 		}
+	}
+
+
+	async onload() {
+		this.registerDomEvent(window, 'keyup', (event) => openSearchWhenDoubleClicked(event, this.app))
+		this.registerDomEvent(window, 'keydown', (event) => clearTimerWhenControlled(event))
+		await this.loadSettings();
+		await this.loadNonJiShoKeiDB();
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
 			// Called when the user clicks the icon.
