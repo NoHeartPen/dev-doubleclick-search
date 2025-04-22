@@ -11,7 +11,7 @@ let lastKeyWasDouble: boolean
 function setUserDefinedKey(key: string) {
 	// TODO 检查用户的自定义按键是否合法
 	PLUGIN_SETTINGS.doubleClickedKey = key;
-	console.log(`用户设置的双击按键为：${PLUGIN_SETTINGS.doubleClickedKey}`);
+	console.log(`User custume double clicked key is: ${PLUGIN_SETTINGS.doubleClickedKey}`);
 }
 
 /**
@@ -68,7 +68,7 @@ function getCursorContextAndIndex(): { context: string, cursorIndex: number } | 
 		 */
 		let context = "";
 		/**
-		 * 光标所在的位置，用于计算形态素分结果
+		 * 光标所在的位置，用于计算形态素分析结果
 		 */
 		let cursorIndex = 0;
 		if (selection === "") {
@@ -90,6 +90,7 @@ function getCursorContextAndIndex(): { context: string, cursorIndex: number } | 
 		return;
 	}
 }
+
 /**
  * 获取光标附近的单词
  */
@@ -100,19 +101,23 @@ async function getCursorWord(): Promise<string | undefined> {
 	const cursorWord = await analyzeCursorWord(context, cursorIndex)
 	console.log(`cursorWord: ${cursorWord}`);
 	// 
-	// TODO context 和 cursorWord 写入到 MonoKakido History.md 中
 	if (cursorWord !== undefined) {
+		// TODO use setting path
 		writeToFile('MonoKakido History.md', context, cursorWord);
 	}
 	return cursorWord;
 }
+
+/**
+ * TODO
+ */
 async function writeToFile(fileName: string, context: string, cursorWord: string): Promise<void> {
 	const activeFile = this.app.workspace.getActiveFile();
 	const vault = this.app.vault;
 	const file = vault.getAbstractFileByPath(fileName);
 	const backLink = `[[${activeFile.basename}]]`;
-	// 允许用户通过设置自定义
-	const noteContent = `> ${context} ${backLink} \n> ${cursorWord} \n> メモ：\n\n`; // 添加双向链接
+	// TODO 允许用户通过设置自定义
+	const noteContent = `> ${context} ${backLink} \n> ${cursorWord} \n> メモ：\n\n`;
 	if (activeFile) {
 		if (file instanceof TFile) {
 			await vault.append(file, noteContent);
@@ -155,7 +160,7 @@ export function getCursorEnglishWord(context: string, cursorIndex: number): stri
  * @returns 
  */
 async function analyzeCursorWord(context: string, cursorIndex: number): Promise<string | undefined> {
-	// TODO 如果不包含任何假名，那么直接通过空格推导
+	// 如果不包含任何假名，那么直接通过空格推导
 	if (!context.match(/[\u3040-\u309F\u30A0-\u30FF]/)) {
 		return getCursorEnglishWord(context, cursorIndex);
 	}
@@ -188,6 +193,8 @@ async function analyzeCursorWord(context: string, cursorIndex: number): Promise<
  * @param word 推导的辞书形
  */
 async function doSearch(word: string) {
+	// 
+	new Notice(`物書堂で「${word}」を引きました`);
 	if (PLUGIN_SETTINGS.searchByOpenUrl === true) {
 		openDictUrl(word)
 	} else {
@@ -223,10 +230,11 @@ const PLUGIN_SETTINGS: PluginSettingsInterface = {
 	// 如果你使用
 	// http://127.0.0.1:8000/
 	morphemeAnalysisAPI: 'https://fast-mikann-api.vercel.app/',
-	// 默认按键设定为 Option 键（在 Windows 上是 Alt 键）
+	// 默认按键为 Option 键（在 Windows 上是 Alt 键）
 	doubleClickedKey: 'Alt'
 }
 
+// TODO MonoKakidoCopilotPlugin => MonokakidoCopilotPlugin
 export default class MonoKakidoCopilotPlugin extends Plugin {
 	settings: PluginSettingsInterface;
 
@@ -235,11 +243,11 @@ export default class MonoKakidoCopilotPlugin extends Plugin {
 		this.registerDomEvent(window, 'keyup', (event) => openSearchWhenDoubleClicked(event, this.app))
 		this.registerDomEvent(window, 'keydown', (event) => clearTimerWhenDoubleClicked(event))
 
-		// Open History
+		// Open Monokakido History
 		const ribbonIconEl = this.addRibbonIcon('magnifying-glass', 'Monokakido Copilot', (evt: MouseEvent) => {
 			const vault = this.app.vault;
 
-			// TODO 只支持指定文件
+			// TODO 只支持指定文件 MonoKakido Copilot History.md
 			const filePath = 'MonoKakido History.md';
 
 			// 查找并打开文件
@@ -247,14 +255,15 @@ export default class MonoKakidoCopilotPlugin extends Plugin {
 			if (file && file instanceof TFile) {
 				this.app.workspace.openLinkText(filePath, '', true);
 			} else {
-				vault.create(filePath, '# MonoKakido History\n\nThis document is used to history.');
+				// TODO This document is used to history.-> {INIT}
+				vault.create(filePath, '# MonoKakido Copilot History\n\nThis document is used to history.');
 				new Notice('File created: ' + filePath);
 				this.app.workspace.openLinkText(filePath, '', true);
 			}
 		});
 		ribbonIconEl.addClass('my-plugin-ribbon-class');
 
-
+		// TODO delelete Modal
 		this.addCommand({
 			id: 'open-sample-modal-simple',
 			name: 'Open sample modal (simple)',
@@ -290,6 +299,7 @@ export default class MonoKakidoCopilotPlugin extends Plugin {
 				}
 			}
 		});
+		// TODO delelete Modal
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SettingTab(this.app, this));
@@ -317,6 +327,7 @@ export default class MonoKakidoCopilotPlugin extends Plugin {
 	}
 }
 
+// TODO delelete Modal
 class SampleModal extends Modal {
 	constructor(app: App) {
 		super(app);
@@ -332,6 +343,7 @@ class SampleModal extends Modal {
 		contentEl.empty();
 	}
 }
+// TODO delelete Modal
 
 class SettingTab extends PluginSettingTab {
 	plugin: MonoKakidoCopilotPlugin;
@@ -356,7 +368,7 @@ class SettingTab extends PluginSettingTab {
 					this.plugin.settings.dictURL = value;
 					await this.plugin.saveSettings();
 				}));
-
+		// TODO
 		new Setting(containerEl)
 			.setName('morphemeAnalysisAPI')
 			.setDesc("if you not know this, please don't change it")
@@ -376,10 +388,10 @@ class SettingTab extends PluginSettingTab {
  */
 async function write2ClipBoard(word: string) {
 	try {
+		// TODO searchWord delete
 		const searchWord = word;
 		await navigator.clipboard.writeText(searchWord);
 		console.log(`write 「${searchWord}」 to clipboard successfully`);
-		new Notice(`Search「${searchWord}」in MonoKakido by clipboard`);
 	} catch (err) {
 		console.error('can not write to clipboard :', err);
 	}
@@ -392,6 +404,7 @@ async function write2ClipBoard(word: string) {
 function openDictUrl(word: string) {
 	let dictUrl = "";
 	if (PLUGIN_SETTINGS.dictURL.includes("<text_to_search>")) {
+		// Monokakido URL Scheme is end with "<text_to_search>".
 		console.log(`defaultDictURL is ${PLUGIN_SETTINGS.dictURL}, includes <text_to_search>`);
 		dictUrl = PLUGIN_SETTINGS.dictURL.replace("<text_to_search>", word);
 	} else if (PLUGIN_SETTINGS.dictURL.includes("{w}")) {
