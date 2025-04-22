@@ -1,11 +1,11 @@
 {
-	"id": " monokakido-copilot-plugin",
+	"id": "obsidian-monokakido-copilot-plugin",
 	"name": "Monokakido Copilot",
 	"version": "0.0.1",
 	"minAppVersion": "0.15.0",
 	"description": "While editing, just click to search with Monokakido Dictionary.",
 	"author": "NoHeartPen",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"authorUrl": "https://github.com/NoHeartPen",
+	"fundingUrl": "https://ko-fi.com/noheartpen",
 	"isDesktopOnly": false
 }
