@@ -247,6 +247,32 @@ export default class MonokakidoCopilotPlugin extends Plugin {
 			this.openHistoryFile();
 		});
 
+		this.addCommand({
+			id: 'open-monokakido-copilot-history',
+			name: 'Open History',
+			callback: () => {
+				this.openHistoryFile();
+			},
+		});
+
+		this.addCommand({
+			id: "search-monokakido-copilot",
+			name: 'Search Monokakido',
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				new Notice(`分析中...`);
+				getCursorWord().then((cursorWord) => {
+					if (cursorWord === undefined) {
+						console.log("cursor word is undefined");
+						return;
+					}
+					console.log("cursor word is: ", cursorWord);
+					doSearch(cursorWord);
+				}).catch((error) => {
+					console.error("get cursor word with error:", error);
+				});
+			}
+		});
+
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SettingTab(this.app, this));
 
