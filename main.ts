@@ -243,7 +243,7 @@ export default class MonokakidoCopilotPlugin extends Plugin {
 		this.registerDomEvent(window, 'keydown', (event) => clearTimerWhenDoubleClicked(event))
 
 		// Open Monokakido History
-		this.addRibbonIcon('file-clock', 'Monokakido Copilot History', () => {
+		this.addRibbonIcon('file-clock', 'Monokakido Copilot History', (evt: MouseEvent) => {
 			this.openHistoryFile();
 		});
 
