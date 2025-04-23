@@ -388,10 +388,8 @@ class SettingTab extends PluginSettingTab {
  */
 async function write2ClipBoard(word: string) {
 	try {
-		// TODO searchWord delete
-		const searchWord = word;
-		await navigator.clipboard.writeText(searchWord);
-		console.log(`write 「${searchWord}」 to clipboard successfully`);
+		await navigator.clipboard.writeText(word);
+		console.log(`write 「${word}」 to clipboard successfully`);
 	} catch (err) {
 		console.error('can not write to clipboard :', err);
 	}
