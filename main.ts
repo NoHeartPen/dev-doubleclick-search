@@ -388,6 +388,9 @@ function openDictUrl(word: string) {
 		// Monokakido URL Scheme is end with "<text_to_search>".
 		console.log(`defaultDictURL is ${PLUGIN_SETTINGS.dictURL}, includes <text_to_search>`);
 		dictUrl = PLUGIN_SETTINGS.dictURL.replace("<text_to_search>", word);
+	} else if (PLUGIN_SETTINGS.dictURL.includes("<文字列>")) {
+		console.log(`defaultDictURL is ${PLUGIN_SETTINGS.dictURL}, includes <文字列>`);
+		dictUrl = PLUGIN_SETTINGS.dictURL.replace("<文字列>", word);
 	} else if (PLUGIN_SETTINGS.dictURL.includes("{w}")) {
 		// 通用的网址链接{w}
 		console.log(`defaultDictURL is ${PLUGIN_SETTINGS.dictURL}, includes {w}`);
