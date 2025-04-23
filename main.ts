@@ -235,7 +235,7 @@ const PLUGIN_SETTINGS: PluginSettingsInterface = {
 }
 
 // TODO MonoKakidoCopilotPlugin => MonokakidoCopilotPlugin
-export default class MonoKakidoCopilotPlugin extends Plugin {
+export default class MonokakidoCopilotPlugin extends Plugin {
 	settings: PluginSettingsInterface;
 
 
@@ -346,9 +346,9 @@ class SampleModal extends Modal {
 // TODO delelete Modal
 
 class SettingTab extends PluginSettingTab {
-	plugin: MonoKakidoCopilotPlugin;
+	plugin: MonokakidoCopilotPlugin;
 
-	constructor(app: App, plugin: MonoKakidoCopilotPlugin) {
+	constructor(app: App, plugin: MonokakidoCopilotPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
