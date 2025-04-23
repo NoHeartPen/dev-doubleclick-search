@@ -244,6 +244,7 @@ export default class MonokakidoCopilotPlugin extends Plugin {
 
 
 	async onload() {
+		await this.loadSettings();
 		this.registerDomEvent(window, 'keyup', (event) => openSearchWhenDoubleClicked(event, this.app))
 		this.registerDomEvent(window, 'keydown', (event) => clearTimerWhenDoubleClicked(event))
 
@@ -316,10 +317,12 @@ export default class MonokakidoCopilotPlugin extends Plugin {
 
 	async loadSettings() {
 		this.settings = Object.assign({}, PLUGIN_SETTINGS, await this.loadData());
+		PLUGIN_SETTINGS.dictURL = this.settings.dictURL
 	}
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+		PLUGIN_SETTINGS.dictURL = this.settings.dictURL
 	}
 }
 
@@ -344,6 +347,7 @@ class SettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.dictURL)
 				.onChange(async (value) => {
 					this.plugin.settings.dictURL = value;
+					PLUGIN_SETTINGS.dictURL = value;
 					await this.plugin.saveSettings();
 				}));
 		// TODO
@@ -379,6 +383,7 @@ async function write2ClipBoard(word: string) {
  */
 function openDictUrl(word: string) {
 	let dictUrl = "";
+	console.log(`openDictUrl: ${PLUGIN_SETTINGS.dictURL}`);
 	if (PLUGIN_SETTINGS.dictURL.includes("<text_to_search>")) {
 		// Monokakido URL Scheme is end with "<text_to_search>".
 		console.log(`defaultDictURL is ${PLUGIN_SETTINGS.dictURL}, includes <text_to_search>`);
