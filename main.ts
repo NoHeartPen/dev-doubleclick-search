@@ -243,10 +243,9 @@ export default class MonokakidoCopilotPlugin extends Plugin {
 		this.registerDomEvent(window, 'keydown', (event) => clearTimerWhenDoubleClicked(event))
 
 		// Open Monokakido History
-		const ribbonIconEl = this.addRibbonIcon('file-clock', 'Monokakido Copilot History', (evt: MouseEvent) => {
+		this.addRibbonIcon('file-clock', 'Monokakido Copilot History', () => {
 			this.openHistoryFile();
 		});
-		ribbonIconEl.addClass('my-plugin-ribbon-class');
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SettingTab(this.app, this));
