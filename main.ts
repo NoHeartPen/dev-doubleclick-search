@@ -244,21 +244,7 @@ export default class MonokakidoCopilotPlugin extends Plugin {
 
 		// Open Monokakido History
 		const ribbonIconEl = this.addRibbonIcon('file-clock', 'Monokakido Copilot History', (evt: MouseEvent) => {
-			const vault = this.app.vault;
-
-			// TODO 只支持指定文件 MonoKakido Copilot History.md
-			const filePath = 'MonoKakido History.md';
-
-			// 查找并打开文件
-			const file = vault.getAbstractFileByPath(filePath);
-			if (file && file instanceof TFile) {
-				this.app.workspace.openLinkText(filePath, '', true);
-			} else {
-				// TODO This document is used to history.-> {INIT}
-				vault.create(filePath, '# MonoKakido Copilot History\n\nThis document is used to history.');
-				new Notice('File created: ' + filePath);
-				this.app.workspace.openLinkText(filePath, '', true);
-			}
+			this.openHistoryFile();
 		});
 		ribbonIconEl.addClass('my-plugin-ribbon-class');
 
@@ -273,6 +259,25 @@ export default class MonokakidoCopilotPlugin extends Plugin {
 
 		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
 		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+	}
+
+	private openHistoryFile() {
+		const vault = this.app.vault;
+
+		// TODO 只支持指定文件 MonoKakido Copilot History.md
+		const filePath = 'MonoKakido Copilot History.md';
+
+		// 查找并打开文件
+		const file = vault.getAbstractFileByPath(filePath);
+		if (file && file instanceof TFile) {
+			this.app.workspace.openLinkText(filePath, '', true);
+		} else {
+			// TODO This document is used to history.-> {INIT}
+			vault.create(filePath, '# MonoKakido Copilot History\n\nThis document is used to history.');
+			// 
+			new Notice('File created: ' + filePath);
+			this.app.workspace.openLinkText(filePath, '', true);
+		}
 	}
 
 	onunload() {
