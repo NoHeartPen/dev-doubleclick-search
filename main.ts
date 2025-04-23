@@ -243,7 +243,7 @@ export default class MonokakidoCopilotPlugin extends Plugin {
 		this.registerDomEvent(window, 'keydown', (event) => clearTimerWhenDoubleClicked(event))
 
 		// Open Monokakido History
-		const ribbonIconEl = this.addRibbonIcon('magnifying-glass', 'Monokakido Copilot', (evt: MouseEvent) => {
+		const ribbonIconEl = this.addRibbonIcon('file-clock', 'Monokakido Copilot History', (evt: MouseEvent) => {
 			const vault = this.app.vault;
 
 			// TODO 只支持指定文件 MonoKakido Copilot History.md
