@@ -1,4 +1,4 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Editor, MarkdownView, Platform, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import { TFile } from 'obsidian';
 
 let lastKeyupTime = 0;
@@ -195,6 +195,11 @@ async function analyzeCursorWord(context: string, cursorIndex: number): Promise<
 async function doSearch(word: string) {
 	// 
 	new Notice(`物書堂で「${word}」を引きました`);
+	if (Platform.isMobileApp) {
+		// 在移动设备上总是通过 URL 自动打开
+		PLUGIN_SETTINGS.searchByOpenUrl = true;
+	}
+
 	if (PLUGIN_SETTINGS.searchByOpenUrl === true) {
 		openDictUrl(word)
 	} else {
