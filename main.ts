@@ -103,7 +103,7 @@ async function getCursorWord(): Promise<string | undefined> {
 	// 
 	if (cursorWord !== undefined) {
 		// TODO use setting path
-		writeToFile('MonoKakido History.md', context, cursorWord);
+		writeToFile(PLUGIN_SETTINGS.historyFilePath, context, cursorWord);
 	}
 	return cursorWord;
 }
@@ -225,6 +225,10 @@ interface PluginSettingsInterface {
 	 * 双击指定的按键触发搜索
 	 */
 	doubleClickedKey: string;
+	/**
+	 * 查词历史记录文件路径
+	 */
+	historyFilePath: string;
 }
 
 const PLUGIN_SETTINGS: PluginSettingsInterface = {
@@ -236,7 +240,9 @@ const PLUGIN_SETTINGS: PluginSettingsInterface = {
 	// http://127.0.0.1:8000/
 	morphemeAnalysisAPI: 'https://fast-mikann-api.vercel.app/',
 	// 默认按键为 Option 键（在 Windows 上是 Alt 键）
-	doubleClickedKey: 'Alt'
+	doubleClickedKey: 'Alt',
+	// 查词历史记录文件路径
+	historyFilePath: 'MonoKakido Copilot History.md'
 }
 
 export default class MonokakidoCopilotPlugin extends Plugin {
@@ -296,7 +302,7 @@ export default class MonokakidoCopilotPlugin extends Plugin {
 		const vault = this.app.vault;
 
 		// TODO 只支持指定文件 MonoKakido Copilot History.md
-		const filePath = 'MonoKakido Copilot History.md';
+		const filePath = PLUGIN_SETTINGS.historyFilePath;
 
 		// 查找并打开文件
 		const file = vault.getAbstractFileByPath(filePath);
