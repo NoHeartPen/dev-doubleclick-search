@@ -125,10 +125,11 @@ async function writeToHistory(fileName: string, context: string, word: string): 
 
 /**
  * 获取光标处附近的英文单词
- * @param context 文本域的内容
+ * @param context 光标所在的上下文
+ * @param cursorIndex 光标位置
  * @returns 光标附近的英文单词，如果没有则返回空字符串
  */
-export function getCursorEnglishWord(context: string, cursorIndex: number): string {
+function getCursorEnglishWord(context: string, cursorIndex: number): string {
 	let start: number = cursorIndex;
 	let end: number = cursorIndex;
 
