@@ -1,7 +1,7 @@
 {
 	"id": "obsidian-monokakido-copilot-plugin",
 	"name": "Monokakido Copilot",
-	"version": "0.0.1",
+	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
 	"description": "While editing, just click to search with Monokakido Dictionary.",
 	"author": "NoHeartPen",
