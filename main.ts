@@ -374,6 +374,6 @@ function openDictUrl(word: string) {
 		console.log(`defaultDictURL is ${PLUGIN_SETTINGS.dictURL}`);
 		dictUrl = PLUGIN_SETTINGS.dictURL + word;
 	}
-	window.location.href = dictUrl;
+	window.open(dictUrl, '_blank');
 }
 
