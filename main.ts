@@ -94,19 +94,25 @@ async function getCursorWord(): Promise<string | undefined> {
 	// 
 	if (cursorWord !== undefined) {
 		// TODO use setting path
-		writeToFile(PLUGIN_SETTINGS.historyFilePath, context, cursorWord);
+		writeToHistory(PLUGIN_SETTINGS.historyFilePath, context, cursorWord);
 	}
 	return cursorWord;
 }
 
 
-async function writeToFile(fileName: string, context: string, cursorWord: string): Promise<void> {
+/**
+ * 将查词历史记录写入到指定的文件中
+ * @param fileName 查词历史文件名
+ * @param context 查词时的语境
+ * @param word 所查单词
+ */
+async function writeToHistory(fileName: string, context: string, word: string): Promise<void> {
 	const activeFile = this.app.workspace.getActiveFile();
 	const vault = this.app.vault;
 	const file = vault.getAbstractFileByPath(fileName);
 	const backLink = `[[${activeFile.basename}]]`;
 	// TODO 允许用户通过设置自定义
-	const noteContent = `> ${context} ${backLink} \n> ${cursorWord} \n> メモ：\n\n`;
+	const noteContent = `> ${context} ${backLink}\n> ${word}\n> メモ：\n\n`;
 	if (activeFile) {
 		if (file instanceof TFile) {
 			await vault.append(file, noteContent);
