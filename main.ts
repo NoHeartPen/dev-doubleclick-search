@@ -148,10 +148,10 @@ function getCursorEnglishWord(context: string, cursorIndex: number): string {
 
 
 /**
- * 形态素分析
- * @param context 
- * @param cursorIndex 
- * @returns 
+ * 分析光标附近的单词
+ * @param context 光标所在的上下文
+ * @param cursorIndex 光标的位置
+ * @returns 如果含有假名那么调用 API 分析光标附近单词的辞书形，反之直接借助空格判断
  */
 async function analyzeCursorWord(context: string, cursorIndex: number): Promise<string | undefined> {
 	// 如果不包含任何假名，那么直接通过空格推导
@@ -187,7 +187,6 @@ async function analyzeCursorWord(context: string, cursorIndex: number): Promise<
  * @param word 推导的辞书形
  */
 async function doSearch(word: string) {
-	// 
 	new Notice(`物書堂で「${word}」を引きました`);
 	if (Platform.isMobileApp) {
 		// 在移动设备上总是通过 URL 自动打开
@@ -359,7 +358,7 @@ async function write2ClipBoard(word: string) {
 
 /**
  * 通过调用 URL Scheme 打开辞书
- * @param word 
+ * @param word 用于拼接 URL Scheme 的单词
  */
 function openDictUrl(word: string) {
 	let dictUrl = "";
