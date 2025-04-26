@@ -3,6 +3,19 @@ import { App, Editor, MarkdownView, Platform, Notice, Plugin, PluginSettingTab, 
 let lastKeyupTime = 0;
 let lastKeyWasDouble: boolean
 
+/**
+ * 调试模式开关
+ */
+const isDebug = false;
+
+/**
+ * 调试日志
+ */
+function debugLog(...args: string[]) {
+	if (isDebug) {
+		console.log(...args);
+	}
+}
 
 /**
  * 注册双击监听事件
@@ -77,9 +90,9 @@ function getCursorContextAndIndex(): { context: string, cursorIndex: number } | 
 async function getCursorWord(): Promise<string | undefined> {
 	const context = getCursorContextAndIndex()?.context ?? "";
 	const cursorIndex = getCursorContextAndIndex()?.cursorIndex ?? 0;
-	console.log(`context: ${context}, cursorIndex: ${cursorIndex}`);
+	debugLog(`context: ${context}, cursorIndex: ${cursorIndex}`);
 	const word = await analyzeCursorWord(context, cursorIndex)
-	console.log(`cursorWord: ${word}`);
+	debugLog(`cursorWord: ${word}`);
 	if (word !== undefined) {
 		writeToHistory(PLUGIN_SETTINGS.historyFilePath, context, word);
 	}
@@ -106,9 +119,9 @@ async function writeToHistory(fileName: string, context: string, word: string): 
 		} else {
 			await vault.create(fileName, noteContent);
 		}
-		console.log(`Content written to file: ${fileName}`);
+		debugLog(`Content written to file: ${fileName}`);
 	} else {
-		console.log("No active file found. Cannot create back link.");
+		debugLog("No active file found. Cannot create back link.");
 	}
 }
 
@@ -165,7 +178,7 @@ async function analyzeCursorWord(context: string, cursorIndex: number): Promise<
 
 	const data = await response.json();
 	// 返回的数据格式： {jishokei: 'かける'}
-	console.log(data);
+	debugLog(data);
 	const cursorWords = data.jishokei;
 	return cursorWords;
 }
@@ -340,7 +353,7 @@ class SettingTab extends PluginSettingTab {
 async function write2ClipBoard(word: string) {
 	try {
 		await navigator.clipboard.writeText(word);
-		console.log(`write 「${word}」 to clipboard successfully`);
+		debugLog(`write 「${word}」 to clipboard successfully`);
 	} catch (err) {
 		console.error('can not write to clipboard :', err);
 	}
@@ -352,22 +365,22 @@ async function write2ClipBoard(word: string) {
  */
 function openDictUrl(word: string) {
 	let dictUrl = "";
-	console.log(`openDictUrl: ${PLUGIN_SETTINGS.dictURL}`);
+	debugLog(`openDictUrl: ${PLUGIN_SETTINGS.dictURL}`);
 	if (PLUGIN_SETTINGS.dictURL.includes("<text_to_search>")) {
 		// Monokakido URL Scheme is end with "<text_to_search>".
-		console.log(`defaultDictURL is ${PLUGIN_SETTINGS.dictURL}, includes <text_to_search>`);
+		debugLog(`defaultDictURL is ${PLUGIN_SETTINGS.dictURL}, includes <text_to_search>`);
 		dictUrl = PLUGIN_SETTINGS.dictURL.replace("<text_to_search>", word);
 	} else if (PLUGIN_SETTINGS.dictURL.includes("<文字列>")) {
-		console.log(`defaultDictURL is ${PLUGIN_SETTINGS.dictURL}, includes <文字列>`);
+		debugLog(`defaultDictURL is ${PLUGIN_SETTINGS.dictURL}, includes <文字列>`);
 		dictUrl = PLUGIN_SETTINGS.dictURL.replace("<文字列>", word);
 	} else if (PLUGIN_SETTINGS.dictURL.includes("{w}")) {
 		// 通用的网址链接{w}
-		console.log(`defaultDictURL is ${PLUGIN_SETTINGS.dictURL}, includes {w}`);
+		debugLog(`defaultDictURL is ${PLUGIN_SETTINGS.dictURL}, includes {w}`);
 		dictUrl = PLUGIN_SETTINGS.dictURL.replace("{w}", word);
 	}
 	else {
 		// 直接在 URL Scheme 末尾拼接上单词
-		console.log(`defaultDictURL is ${PLUGIN_SETTINGS.dictURL}`);
+		debugLog(`defaultDictURL is ${PLUGIN_SETTINGS.dictURL}`);
 		dictUrl = PLUGIN_SETTINGS.dictURL + word;
 	}
 	window.open(dictUrl, '_blank');
