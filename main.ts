@@ -89,14 +89,12 @@ async function getCursorWord(): Promise<string | undefined> {
 	const context = getCursorContextAndIndex()?.context ?? "";
 	const cursorIndex = getCursorContextAndIndex()?.cursorIndex ?? 0;
 	console.log(`context: ${context}, cursorIndex: ${cursorIndex}`);
-	const cursorWord = await analyzeCursorWord(context, cursorIndex)
-	console.log(`cursorWord: ${cursorWord}`);
-	// 
-	if (cursorWord !== undefined) {
-		// TODO use setting path
-		writeToHistory(PLUGIN_SETTINGS.historyFilePath, context, cursorWord);
+	const word = await analyzeCursorWord(context, cursorIndex)
+	console.log(`cursorWord: ${word}`);
+	if (word !== undefined) {
+		writeToHistory(PLUGIN_SETTINGS.historyFilePath, context, word);
 	}
-	return cursorWord;
+	return word;
 }
 
 
