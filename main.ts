@@ -351,17 +351,6 @@ class SettingTab extends PluginSettingTab {
 					PLUGIN_SETTINGS.dictURL = value;
 					await this.plugin.saveSettings();
 				}));
-		// TODO
-		new Setting(containerEl)
-			.setName('morphemeAnalysisAPI')
-			.setDesc("if you not know this, please don't change it")
-			.addText(text => text
-				.setPlaceholder(PLUGIN_SETTINGS.morphemeAnalysisAPI)
-				.setValue(this.plugin.settings.morphemeAnalysisAPI)
-				.onChange(async (value) => {
-					this.plugin.settings.morphemeAnalysisAPI = value;
-					await this.plugin.saveSettings();
-				}));
 	}
 }
 
