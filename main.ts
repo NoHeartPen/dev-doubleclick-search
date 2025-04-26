@@ -236,9 +236,9 @@ const PLUGIN_SETTINGS: PluginSettingsInterface = {
 	dictURL: 'mkdictionaries:///?text=<text_to_search>',
 	// 默认不使用剪贴板查询模式
 	searchByOpenUrl: false,
-	// 如果你使用
-	// http://127.0.0.1:8000/
-	morphemeAnalysisAPI: 'https://fast-mikann-api.vercel.app/',
+	// 如果你使用源码自己在本地部署请修改成 <http://127.0.0.1:8000/>
+	// 形态素分析的源码 <https://github.com/NoHeartPen/fast-mikann-api>
+	morphemeAnalysisAPI: 'https://www.nonjishokei.org/',
 	// 默认按键为 Option 键（在 Windows 上是 Alt 键）
 	doubleClickedKey: 'Alt',
 	// 查词历史记录文件路径
@@ -285,23 +285,18 @@ export default class MonokakidoCopilotPlugin extends Plugin {
 			}
 		});
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SettingTab(this.app, this));
 
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
 		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
 			console.log('click', evt);
 		});
 
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
 		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 	}
 
 	private openHistoryFile() {
 		const vault = this.app.vault;
 
-		// TODO 只支持指定文件 MonoKakido Copilot History.md
 		const filePath = PLUGIN_SETTINGS.historyFilePath;
 
 		// 查找并打开文件
