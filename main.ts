@@ -22,19 +22,8 @@ function openSearchWhenDoubleClicked(event: KeyboardEvent, app: App) {
 	}
 
 	if (Date.now() - lastKeyupTime < 500) {
-		new Notice(`分析中...`);
 		lastKeyupTime = 0;
-		getCursorWord().then((cursorWord) => {
-			if (cursorWord === undefined) {
-				console.log("cursor word is undefined");
-				return;
-			}
-			console.log("cursor word is: ", cursorWord);
-			doSearch(cursorWord);
-		}).catch((error) => {
-			console.error("get cursor word with error:", error);
-		});
-		return;
+		searchWordAtCursor();
 	}
 	lastKeyupTime = Date.now();
 }
@@ -238,6 +227,22 @@ const PLUGIN_SETTINGS: PluginSettingsInterface = {
 	historyFilePath: 'MonoKakido Copilot History.md'
 }
 
+/**
+ * 搜索光标附近的单词
+ */
+async function searchWordAtCursor() {
+	new Notice('分析中、少々お待ちください。');
+	try {
+		const cursorWord = await getCursorWord();
+		if (!cursorWord) {
+			return;
+		}
+		doSearch(cursorWord);
+	} catch (error) {
+		console.error('Error getting cursor word:', error);
+	}
+}
+
 export default class MonokakidoCopilotPlugin extends Plugin {
 	settings: PluginSettingsInterface;
 
@@ -269,16 +274,7 @@ export default class MonokakidoCopilotPlugin extends Plugin {
 			id: 'search-monokakido-copilot',
 			name: 'Search Cursor word',
 			editorCallback: async (editor: Editor, view: MarkdownView) => {
-				new Notice('分析中、少々お待ちください。');
-				try {
-					const cursorWord = await getCursorWord();
-					if (!cursorWord) {
-						return;
-					}
-					doSearch(cursorWord);
-				} catch (error) {
-					console.error('Error getting cursor word:', error);
-				}
+				searchWordAtCursor();
 			},
 		});
 	}
