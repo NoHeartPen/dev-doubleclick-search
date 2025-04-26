@@ -241,78 +241,72 @@ const PLUGIN_SETTINGS: PluginSettingsInterface = {
 export default class MonokakidoCopilotPlugin extends Plugin {
 	settings: PluginSettingsInterface;
 
-
 	async onload() {
 		await this.loadSettings();
-		this.registerDomEvent(window, 'keyup', (event) => openSearchWhenDoubleClicked(event, this.app))
-		this.registerDomEvent(window, 'keydown', (event) => clearTimerWhenDoubleClicked(event))
+		this.registerDomEvent(window, 'keyup', (event) => openSearchWhenDoubleClicked(event, this.app));
+		this.registerDomEvent(window, 'keydown', (event) => clearTimerWhenDoubleClicked(event));
 
-		// Open Monokakido History
-		this.addRibbonIcon('file-clock', 'Monokakido Copilot History', (evt: MouseEvent) => {
+		this.addRibbonIcon('file-clock', 'Monokakido Copilot history', () => {
 			this.openHistoryFile();
 		});
 
+		this.registerCommands();
+
+		this.addSettingTab(new SettingTab(this.app, this));
+	}
+
+
+	private registerCommands() {
 		this.addCommand({
 			id: 'open-monokakido-copilot-history',
-			name: 'Open History',
+			name: 'Open history',
 			callback: () => {
 				this.openHistoryFile();
 			},
 		});
 
 		this.addCommand({
-			id: "search-monokakido-copilot",
-			name: 'Search Monokakido',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				new Notice(`分析中...`);
-				getCursorWord().then((cursorWord) => {
-					if (cursorWord === undefined) {
-						console.log("cursor word is undefined");
+			id: 'search-monokakido-copilot',
+			name: 'Search Cursor word',
+			editorCallback: async (editor: Editor, view: MarkdownView) => {
+				new Notice('分析中、少々お待ちください。');
+				try {
+					const cursorWord = await getCursorWord();
+					if (!cursorWord) {
 						return;
 					}
-					console.log("cursor word is: ", cursorWord);
 					doSearch(cursorWord);
-				}).catch((error) => {
-					console.error("get cursor word with error:", error);
-				});
-			}
+				} catch (error) {
+					console.error('Error getting cursor word:', error);
+				}
+			},
 		});
-
-		this.addSettingTab(new SettingTab(this.app, this));
-
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			console.log('click', evt);
-		});
-
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 	}
 
 	private openHistoryFile() {
 		const vault = this.app.vault;
 		const filePath = PLUGIN_SETTINGS.historyFilePath;
 		const file = vault.getAbstractFileByPath(filePath);
-		if (file && file instanceof TFile) {
+		if (file instanceof TFile) {
 			this.app.workspace.openLinkText(filePath, '', true);
 		} else {
-			// TODO This document is used to history.-> {INIT}
-			vault.create(filePath, '# MonoKakido Copilot History\n\nThis document is used to history.');
-			new Notice('File created: ' + filePath);
+			vault.create(
+				filePath,
+				'# MonoKakido Copilot history\n\nThis document is used for history.'
+			);
+			new Notice(`単語メモ帳は: ${filePath}`);
 			this.app.workspace.openLinkText(filePath, '', true);
 		}
 	}
 
-	onunload() {
-
-	}
-
 	async loadSettings() {
 		this.settings = Object.assign({}, PLUGIN_SETTINGS, await this.loadData());
-		PLUGIN_SETTINGS.dictURL = this.settings.dictURL
+		PLUGIN_SETTINGS.dictURL = this.settings.dictURL;
 	}
 
 	async saveSettings() {
 		await this.saveData(this.settings);
-		PLUGIN_SETTINGS.dictURL = this.settings.dictURL
+		PLUGIN_SETTINGS.dictURL = this.settings.dictURL;
 	}
 }
 
