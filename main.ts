@@ -1,18 +1,8 @@
-import { App, Editor, MarkdownView, Platform, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
-import { TFile } from 'obsidian';
+import { App, Editor, MarkdownView, Platform, Notice, Plugin, PluginSettingTab, Setting, TFile } from 'obsidian';
 
 let lastKeyupTime = 0;
 let lastKeyWasDouble: boolean
 
-/**
- * 允许用户自定义按键
- * @param key 触发分析的按键
- */
-function setUserDefinedKey(key: string) {
-	// TODO 检查用户的自定义按键是否合法
-	PLUGIN_SETTINGS.doubleClickedKey = key;
-	console.log(`User custume double clicked key is: ${PLUGIN_SETTINGS.doubleClickedKey}`);
-}
 
 /**
  * 注册双击监听事件
@@ -57,6 +47,7 @@ function clearTimerWhenDoubleClicked(event: KeyboardEvent) {
 		lastKeyWasDouble = true;
 	}
 }
+
 
 function getCursorContextAndIndex(): { context: string, cursorIndex: number } | undefined {
 	const view = this.app.workspace.getActiveViewOfType(MarkdownView);
@@ -108,9 +99,7 @@ async function getCursorWord(): Promise<string | undefined> {
 	return cursorWord;
 }
 
-/**
- * TODO
- */
+
 async function writeToFile(fileName: string, context: string, cursorWord: string): Promise<void> {
 	const activeFile = this.app.workspace.getActiveFile();
 	const vault = this.app.vault;
@@ -296,17 +285,13 @@ export default class MonokakidoCopilotPlugin extends Plugin {
 
 	private openHistoryFile() {
 		const vault = this.app.vault;
-
 		const filePath = PLUGIN_SETTINGS.historyFilePath;
-
-		// 查找并打开文件
 		const file = vault.getAbstractFileByPath(filePath);
 		if (file && file instanceof TFile) {
 			this.app.workspace.openLinkText(filePath, '', true);
 		} else {
 			// TODO This document is used to history.-> {INIT}
 			vault.create(filePath, '# MonoKakido Copilot History\n\nThis document is used to history.');
-			// 
 			new Notice('File created: ' + filePath);
 			this.app.workspace.openLinkText(filePath, '', true);
 		}
@@ -355,8 +340,8 @@ class SettingTab extends PluginSettingTab {
 }
 
 /**
- * 写入剪贴板
- * @param word 
+ * 将要查的单词写入剪贴板
+ * @param word 需要要写入剪贴板的单词
  */
 async function write2ClipBoard(word: string) {
 	try {
