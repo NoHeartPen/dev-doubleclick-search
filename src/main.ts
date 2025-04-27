@@ -1,6 +1,5 @@
 import { App, Editor, MarkdownView, Platform, Notice, Plugin, PluginSettingTab, Setting, TFile, normalizePath } from 'obsidian';
 
-
 /**
  * 调试模式开关
  */
@@ -351,6 +350,7 @@ export default class MonokakidoCopilotPlugin extends Plugin {
 		PLUGIN_SETTINGS.dictURL = this.settings.dictURL;
 	}
 }
+
 
 class SettingTab extends PluginSettingTab {
 	plugin: MonokakidoCopilotPlugin;
