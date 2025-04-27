@@ -1,7 +1,5 @@
 import { App, Editor, MarkdownView, Platform, Notice, Plugin, PluginSettingTab, Setting, TFile } from 'obsidian';
 
-let lastKeyupTime = 0;
-let lastKeyWasDouble: boolean
 
 /**
  * 调试模式开关
@@ -14,39 +12,6 @@ const isDebug = false;
 function debugLog(...args: string[]) {
 	if (isDebug) {
 		console.log(...args);
-	}
-}
-
-/**
- * 注册双击监听事件
- * @param event 
- * @param app 
- */
-function openSearchWhenDoubleClicked(event: KeyboardEvent, app: App) {
-	const key = event.key;
-	if (key !== PLUGIN_SETTINGS.doubleClickedKey) {
-		lastKeyupTime = 0;
-		return;
-	}
-
-	if (lastKeyWasDouble) {
-		lastKeyWasDouble = false;
-		return;
-	}
-
-	if (Date.now() - lastKeyupTime < 500) {
-		lastKeyupTime = 0;
-		searchWordAtCursor();
-	}
-	lastKeyupTime = Date.now();
-}
-
-/** 
- * 用户双击时自动处理逻辑
- */
-function clearTimerWhenDoubleClicked(event: KeyboardEvent) {
-	if (event.key !== PLUGIN_SETTINGS.doubleClickedKey) {
-		lastKeyWasDouble = true;
 	}
 }
 
@@ -259,10 +224,46 @@ async function searchWordAtCursor() {
 export default class MonokakidoCopilotPlugin extends Plugin {
 	settings: PluginSettingsInterface;
 
+	private lastKeyupTime = 0;
+	private lastKeyWasDouble: boolean
+
+	/**
+	 * 双击监听指定按键时触发搜索
+	 * @param event 
+	 * @param app 
+	 */
+	private searchOnDoublePress(event: KeyboardEvent, app: App) {
+		const key = event.key;
+		if (key !== PLUGIN_SETTINGS.doubleClickedKey) {
+			this.lastKeyupTime = 0;
+			return;
+		}
+
+		if (this.lastKeyWasDouble) {
+			this.lastKeyWasDouble = false;
+			return;
+		}
+
+		if (Date.now() - this.lastKeyupTime < 500) {
+			this.lastKeyupTime = 0;
+			searchWordAtCursor();
+		}
+		this.lastKeyupTime = Date.now();
+	}
+
+	/** 
+	 * 双击指定按键后清空计时器
+	 */
+	private clearTimerOnDoublePress(event: KeyboardEvent) {
+		if (event.key !== PLUGIN_SETTINGS.doubleClickedKey) {
+			this.lastKeyWasDouble = true;
+		}
+	}
+
 	async onload() {
 		await this.loadSettings();
-		this.registerDomEvent(window, 'keyup', (event) => openSearchWhenDoubleClicked(event, this.app));
-		this.registerDomEvent(window, 'keydown', (event) => clearTimerWhenDoubleClicked(event));
+		this.registerDomEvent(window, 'keyup', (event) => this.searchOnDoublePress(event, this.app));
+		this.registerDomEvent(window, 'keydown', (event) => this.clearTimerOnDoublePress(event));
 
 		this.addRibbonIcon('file-clock', 'Monokakido Copilot history', () => {
 			this.openHistoryFile();
