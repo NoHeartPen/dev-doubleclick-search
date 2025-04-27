@@ -47,20 +47,43 @@ function getCursorContextAndIndex(): { context: string, cursorIndex: number } | 
 		context = selection;
 		cursorIndex = 0;
 	}
-	// TODO 删除文本中的 markdown 语法，比如 **bold**，*italic*，`code`,> 和 Obsidian 的高亮语法 ==,
 	return { context, cursorIndex };
 }
 
 /**
- * 获取光标附近的单词
+ * 移除字符串中的常见 Markdown 语法和 Obsidian 高亮标记，
+ * 返回去除格式后的纯文本内容。
+ * @param text 输入的可能包含 Markdown 格式的文本
+ * @returns 去除 Markdown 格式后的纯文本
+ */
+function removeMarkdownSyntax(text: string): string {
+	return text
+		// 移除加粗 **text**
+		.replace(/\*\*(.*?)\*\*/g, '$1')
+		// 移除斜体 *text* or _text_
+		.replace(/(\*|_)(.*?)\1/g, '$2')
+		// 移除行内 `code`
+		.replace(/`([^`]+)`/g, '$1')
+		// Obsidian 专用高亮语法 ==text==
+		.replace(/==(.+?)==/g, '$1')
+		// 块引用 > blockquote
+		.replace(/^>\s?/gm, '')
+		// 标题 # Headings、 列表 -, +, *
+		.replace(/^[#*-]\s?/gm, '')
+		.trim();
+}
+
+/**
+ * 获取光标附近的单词，并将上下文和单词保存到历史记录
  */
 async function getCursorWord(): Promise<string | undefined> {
-	const context = getCursorContextAndIndex()?.context ?? "";
+	let context = getCursorContextAndIndex()?.context ?? "";
 	const cursorIndex = getCursorContextAndIndex()?.cursorIndex ?? 0;
 	debugLog(`context: ${context}, cursorIndex: ${cursorIndex}`);
 	const word = await analyzeCursorWord(context, cursorIndex)
 	debugLog(`cursorWord: ${word}`);
 	if (word !== undefined) {
+		context = removeMarkdownSyntax(context);
 		writeToHistory(PLUGIN_SETTINGS.historyFilePath, context, word);
 	}
 	return word;
