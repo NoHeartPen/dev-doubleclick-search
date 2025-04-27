@@ -308,7 +308,7 @@ export default class MonokakidoCopilotPlugin extends Plugin {
 
 	private registerCommands() {
 		this.addCommand({
-			id: 'open-monokakido-copilot-history',
+			id: 'open-history',
 			name: 'Open history',
 			callback: () => {
 				this.openHistoryFile();
@@ -316,7 +316,7 @@ export default class MonokakidoCopilotPlugin extends Plugin {
 		});
 
 		this.addCommand({
-			id: 'search-monokakido-copilot',
+			id: 'search-cursor-word',
 			name: 'Search Cursor word',
 			editorCallback: async (editor: Editor, view: MarkdownView) => {
 				searchWordAtCursor();
