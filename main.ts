@@ -16,37 +16,39 @@ function debugLog(...args: string[]) {
 }
 
 
-function getCursorContextAndIndex(): { context: string, cursorIndex: number } | undefined {
+/**
+ * 获取光标所在行的上下文和索引，如果当前无有效 Markdown 编辑器视图，则返回 null。
+ * @returns {object|null} 返回一个对象，包含以下属性：
+ *  - context {string} 当前光标所在行的文本内容
+ *  - cursorIndex {number} 当前光标在该行内的字符索引（从0开始）
+ */
+function getCursorContextAndIndex(): { context: string, cursorIndex: number } | null {
 	const view = this.app.workspace.getActiveViewOfType(MarkdownView);
-	if (view) {
-		const editor = view.editor;
-		const selection = editor.getSelection();
-		/**
-		 * 光标所在行的所有文本，用于分析光标附近文本对应的辞书形
-		 */
-		let context = "";
-		/**
-		 * 光标所在的位置，用于计算形态素分析结果
-		 */
-		let cursorIndex = 0;
-		if (selection === "") {
-			const cursor = editor.getCursor();
-			// 获取光标所在行的所有文本
-			const cursorLineText = editor.getRange({ line: cursor.line, ch: 0 }, { line: cursor.line, ch: editor.getLine(cursor.line).length });
-			context = cursorLineText
-			cursorIndex = cursor.ch;
-		} else {
-			// 如果用户有选中文本，那么直接提交选中的文本
-			// TODO 笑了这种情况下 cursorIndex 直接使用 0 就行了么
-			context = selection;
-			cursorIndex = 0;
-		}
-		// TODO 删除文本中的 markdown 语法，比如 **bold**，*italic*，`code`,>,
-		return { context, cursorIndex };
-	} else {
-		console.error("No active MarkdownView found.");
-		return;
+	if (!view) {
+		console.error('No active MarkdownView found.');
+		return null;
 	}
+	const editor = view.editor;
+	/**
+	 * 用户想查单词所在的上下文，用于形态素分析
+	 */
+	let context = "";
+	/**
+	 * 光标在上下文中的位置，用于计算形态素分析结果中最靠近光标的结果
+	 */
+	let cursorIndex = 0;
+	const selection = editor.getSelection();
+	if (selection === "") {
+		// 如果用户没有选中文字，那么获取光标所在行的所有文本作为上下文
+		const cursor = editor.getCursor();
+		context = editor.getLine(cursor.line);
+		cursorIndex = cursor.ch;
+	} else {
+		context = selection;
+		cursorIndex = 0;
+	}
+	// TODO 删除文本中的 markdown 语法，比如 **bold**，*italic*，`code`,> 和 Obsidian 的高亮语法 ==,
+	return { context, cursorIndex };
 }
 
 /**
