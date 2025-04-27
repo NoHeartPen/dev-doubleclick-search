@@ -1,4 +1,4 @@
-import { App, Editor, MarkdownView, Platform, Notice, Plugin, PluginSettingTab, Setting, TFile } from 'obsidian';
+import { App, Editor, MarkdownView, Platform, Notice, Plugin, PluginSettingTab, Setting, TFile, normalizePath } from 'obsidian';
 
 
 /**
@@ -92,27 +92,33 @@ async function getCursorWord(): Promise<string | undefined> {
 
 /**
  * 将查词历史记录写入到指定的文件中
- * @param fileName 查词历史文件名
- * @param context 查词时的语境
- * @param word 所查单词
+ * @param filePath 保存查词历史的文件路径
+ * @param context 查词时的上下文
+ * @param word 查询的单词
  */
-async function writeToHistory(fileName: string, context: string, word: string): Promise<void> {
+async function writeToHistory(filePath: string, context: string, word: string): Promise<void> {
+	const normalizedFilePath = normalizePath(filePath);
+
 	const activeFile = this.app.workspace.getActiveFile();
-	const vault = this.app.vault;
-	const file = vault.getAbstractFileByPath(fileName);
-	const backLink = `[[${activeFile.basename}]]`;
-	// TODO 允许用户通过设置自定义
-	const noteContent = `> ${context} ${backLink}\n> ${word}\n> メモ：\n\n`;
-	if (activeFile) {
-		if (file instanceof TFile) {
-			await vault.append(file, noteContent);
-		} else {
-			await vault.create(fileName, noteContent);
-		}
-		debugLog(`Content written to file: ${fileName}`);
-	} else {
-		debugLog("No active file found. Cannot create back link.");
+
+	if (!activeFile) {
+		throw new Error('No active file found. Cannot create back link.');
 	}
+	/**
+	 * 添加所查单词的文件作为反向链接
+	 */
+	const backLink = `[[${activeFile.basename}]]`;
+
+	const vault = this.app.vault;
+	const file = vault.getAbstractFileByPath(normalizedFilePath);
+	const noteContent = `\n> ${context} ${backLink}\n> ${word}\n> メモ：\n`;
+
+	if (file instanceof TFile) {
+		await vault.append(file, noteContent);
+	} else {
+		await vault.create(filePath, noteContent);
+	}
+	debugLog(`Content written to file: ${filePath}`);
 }
 
 /**
@@ -325,6 +331,7 @@ export default class MonokakidoCopilotPlugin extends Plugin {
 		if (file instanceof TFile) {
 			this.app.workspace.openLinkText(filePath, '', true);
 		} else {
+			// FIXME 封装，因为有可能在写入笔记时文件又被删除了
 			vault.create(
 				filePath,
 				'# MonoKakido Copilot history\n\nThis document is used for history.'
