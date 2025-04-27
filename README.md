@@ -1,14 +1,5 @@
 # Obsidian Monokakido Copilot Plugin
 
-<p>
- <a href="https://github.com/mom0aut/obsidian-monokakido-copilot/releases">
-        <img src="https://img.shields.io/github/downloads/mom0aut/obsidian-monokakido-copilot/total.svg"
-            alt="Downloads" width="110"></a> 
-    <a href="https://github.com/mom0aut/obsidian-monokakido-copilot/releases">
-        <img src="https://img.shields.io/github/v/release/mom0aut/obsidian-monokakido-copilot"
-            alt="Github latest release" width="110"></a>
-</p>
-
 [日本語版](./README.ja.md)
 
 Double press the `Option` key to search with [Dictionaries by Monokakido](https://www.monokakido.jp/en/dictionaries/app/index.html).
@@ -23,12 +14,12 @@ All you need is just **double** press the `Option` key.
 
 From Obsidian v0.9.8+, you can activate this plugin within Obsidian by doing the following:
 
--   pen Settings > Third-party plugin
--   Make sure Safe mode is **off**
--   Click Browse community plugins
--   Search for "Monokakido Copilot"
--   Click Install
--   Once installed, close the community plugins window and activate the newly installed plugin
+1. Open Settings > Third-party plugin
+2. Make sure Safe mode is **off**
+3. Click Browse community plugins
+4. Search for "Monokakido Copilot"
+5. Click Install
+6. Once installed, close the community plugins window and activate the newly installed plugin
 
 ### Manually installing the plugin From GitHub
 
